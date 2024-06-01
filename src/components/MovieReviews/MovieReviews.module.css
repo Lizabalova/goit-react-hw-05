@@ -1,10 +1,19 @@
-.blokRewiwe {
-    border-top: 1px solid lightgray;
-    margin: 10px;
+.item {
+    margin-bottom: 16px;
 }
 
-.conteiner {
-    text-decoration: none;
-    list-style: none;
-    border-top: 1px solid lightgray;
+.icon {
+    margin-right: 6px;
+}
+
+.name {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.content {
+    font-size: 14px;
+    display: flex;
+    justify-content: flex-start;
 }

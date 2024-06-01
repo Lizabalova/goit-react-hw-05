@@ -1,65 +1,55 @@
-import css from "./MovieReviews.module.css";
-import clsx from "clsx";
+import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
-import { movieReviews } from "../movie-api";
-import Loader from "../../components/Loader/Loader";
-import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
+import { fetchMovieReviews } from "../../api/apiServices";
+import toast from "react-hot-toast";
+import { FaUserCircle } from "react-icons/fa";
+import css from "./MovieReviews.module.css";
 
-export default function Review() {
-  const [review, setReview] = useState(null);
-    const [error, setError] = useState(false);
-    const { movieId } = useParams();
-    const location = useLocation();
-  const [loading, setLoading] = useState(false);
-  
+const notify = () =>
+  toast.error("Something went wrong. Please, try again!", {
+    style: {
+      border: "1px solid #000000",
+      padding: "16px",
+      color: "#000000",
+    },
+    iconTheme: {
+      primary: "#000000",
+      secondary: "#f5f5f5",
+    },
+  });
+
+export default function MovieReviews() {
+  const [reviewsList, setReviewsList] = useState([]);
+  const { movieId } = useParams();
   useEffect(() => {
-    async function getReview() {
+    const getMovieReviews = async (movieId) => {
       try {
-        setLoading(true);
-        setError(false);
-        const revievs = await movieReviews(movieId);
-
-        setReview(revievs);
+        const data = await fetchMovieReviews(movieId);
+        setReviewsList(data.results);
       } catch (error) {
-        setError(true);
-      } finally {
-        setLoading(false);
+        notify();
       }
-    }
-    
-  getReview();
+    };
+    getMovieReviews(movieId);
   }, [movieId]);
-  
 
   return (
-    <div className={css.blokRewiwe}>
-      <h2>Review</h2>
-      {error && <ErrorMessage />}
+    <main className="container">
       <ul>
-        {review &&
-          review.map(({ id, author, content }) => (
-            <li key={id} className={css.conteiner}>
-              <h3>{author}</h3>
-              <p> {content}</p>
-            </li>
-          ))}
-
-        {/* {(review.length) > 0 ? (
-          review.map(({ id, author, content }) => (
-            <li key={id} className={css.conteiner}>
-              <h3>{author}</h3>
-              <p> {content}</p>
+        {reviewsList.length > 0 ? (
+          reviewsList.map(({ author, content, id }) => (
+            <li key={id} className={css.item}>
+              <p className={css.name}>
+                <FaUserCircle className={css.icon} />
+                {author}
+              </p>
+              <p className={css.content}>{content}</p>
             </li>
           ))
         ) : (
-          <li  className={css.conteiner}>
-            review not found
-          </li>
-        )} */}
+          <p>We do not have any reviews for this movie yet</p>
+        )}
       </ul>
-
-      {loading && <Loader />}
-    </div>
+    </main>
   );
 }

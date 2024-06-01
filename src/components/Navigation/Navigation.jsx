@@ -1,28 +1,22 @@
-import { NavLink } from "react-router-dom";
- import clsx from "clsx";
- import css from "./Navigation.module.css";
-
-const getLinkClass = ({ isActive }) => {
-  return clsx(css.link, isActive && css.active);
-};
+import { NavLink, Outlet } from "react-router-dom";
+import { Suspense } from "react";
+import Loader from "../Loader/Loader";
+import css from "./Navigation.module.css";
 
 export default function Navigation() {
-    return (
-      <div className={css.div}>
-        <nav>
-          <ul className={css.container}>
-            <li>
-              <NavLink to="/" className={getLinkClass}>
-                Home Page
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/movies" className={getLinkClass}>
-                Movies Page
-              </NavLink>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    );
+  return (
+    <header className="container">
+      <nav className={css.nav}>
+        <NavLink to="/" end className={css.navLink} activeClassName="active">
+          Home
+        </NavLink>
+        <NavLink to="/movies" className={css.navLink} activeClassName="active">
+          Movies
+        </NavLink>
+        <Suspense fallback={<Loader />}>
+          <Outlet />
+        </Suspense>
+      </nav>
+    </header>
+  );
 }

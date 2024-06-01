@@ -1,42 +1,21 @@
-import toast, { Toaster } from "react-hot-toast";
-
 import css from "./SearchBar.module.css";
 
-export default function SearchBar({ onSearch }) {
-  const handleSubmit = (evt) => {
-    evt.preventDefault();
-    const form = evt.target;
-    const searchMovie = form.elements.searchMovie.value;
-
-    if (searchMovie.trim() === "") {
-      toast("Please fill in search folder", {
-        style: {
-          color: "red",
-        },
-      });
-      return;
-    }
-
-    onSearch(searchMovie);
-    form.reset();
-  };
-
+export default function SearchBar({ onSubmit }) {
   return (
-    <header className={css.header}>
-      <form className={css.form} onSubmit={handleSubmit}>
-        <input
-          className={css.input}
-          type="text"
-          name="searchMovie"
-          autoComplete="off"
-          autoFocus
-          placeholder="Search movies"
-        />
-        <button className={css.btn} type="submit">
-          Search
-        </button>
-        <Toaster />
-      </form>
-    </header>
+    <form onSubmit={onSubmit} className={css.form}>
+      <input
+        type="text"
+        name="movieName"
+        placeholder="Enter movie name"
+        autoComplete="off"
+        autoFocus
+        pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+        required
+        className={css.input}
+      />
+      <button type="submit" className={css.btnSearch}>
+        Search
+      </button>
+    </form>
   );
 }

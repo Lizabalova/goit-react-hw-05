@@ -1,67 +1,57 @@
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { fetchMovieCast } from "../../api/apiServices";
+import toast from "react-hot-toast";
 import css from "./MovieCast.module.css";
-import clsx from "clsx";
-import { Suspense, useEffect, useRef, useState } from "react";
-import { NavLink, Outlet, useLocation, useParams } from "react-router-dom";
 
-import { movieActors } from "../../components/movie-api";
-import Loader from "../../components/Loader/Loader";
-import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
-
+const notify = () =>
+  toast.error("Something went wrong. Please, try again!", {
+    style: {
+      border: "1px solid #000000",
+      padding: "16px",
+      color: "#000000",
+    },
+    iconTheme: {
+      primary: "#000000",
+      secondary: "#f5f5f5",
+    },
+  });
 
 export default function MovieCast() {
-  const [casts, setCasts] = useState(null);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [castList, setCastList] = useState([]);
   const { movieId } = useParams();
-  const location = useLocation();
-
   useEffect(() => {
-    if (movieId === "") {
-      return;
-  }
-    async function getCast() {
+    const getMovieCast = async (movieId) => {
       try {
-        setLoading(true);
-        setError(false);
-        const Actors = await movieActors(movieId);
-
-        setCasts(Actors);
+        const data = await fetchMovieCast(movieId);
+        setCastList(data.cast);
       } catch (error) {
-        setError(true);
-      } finally {
-        setLoading(false);
+        notify();
       }
-    }
-
-    getCast();
+    };
+    getMovieCast(movieId);
   }, [movieId]);
 
-  
   return (
-    <div className={css.blokActors}>
-      <h3> About actors</h3>
-      {error && <ErrorMessage />}
-      <ul className={css.list}>
-        {casts &&
-          casts.map(({ id, name, profile_path, character }) => (
-            <li key={id} className={css.conteiner}>
+    <ul className={css.castList}>
+      {castList.length > 0
+        ? castList.map(({ id, name, profile_path, character }) => (
+            <li key={id} className={css.listItem}>
               <img
-                className={css.img}
                 src={
                   profile_path
                     ? `https://image.tmdb.org/t/p/w200${profile_path}`
                     : `http://www.suryalaya.org/images/no_image.jpg`
                 }
-                alt={name}
+                alt="actor"
+                loading="lazy"
+                width="120"
               />
-              <div>
-                <h3>{name}</h3>
-                <p> Character: {character}</p>
-              </div>
+              <h3 className={css.name}>{name}</h3>
+              <p className={css.character}> Character: {character}</p>
             </li>
-          ))}
-      </ul>
-      {loading && <Loader />}
-    </div>
+          ))
+        : "Sorry, there isn't any info"}
+    </ul>
   );
 }

@@ -1,69 +1,92 @@
-import toast, { Toaster } from "react-hot-toast";
-import css from "./MoviesPage.module.css";
-
-import axios from "axios";
-import { searchMovies } from "../../components/movie-api";
-import { useEffect, useState } from "react";
-import MovieGallery from "../../components/MovieGallery/MovieGallery";
-
+import { useSearchParams, useLocation, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { fetchMovieByKeyword } from "../../api/apiServices";
 import SearchBar from "../../components/SearchBar/SearchBar";
 import Loader from "../../components/Loader/Loader";
-import LoadMoreBtn from "../../components/LoadMoreBtn/LoadMoreBtn";
-import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
+import toast from "react-hot-toast";
+import css from "./MoviesPage.module.css";
 
-export default function MoviesPage({ onSearch }) {
-  const [Movies, setMovies] = useState([]);
+const notify = (msg) =>
+  toast.error(`${msg}`, {
+    style: {
+      border: "1px solid #000000",
+      padding: "16px",
+      color: "#000000",
+    },
+    iconTheme: {
+      primary: "#000000",
+      secondary: "#f5f5f5",
+    },
+  });
+
+export default function MoviesPage() {
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const movieName = searchParams.get("movieName") ?? "";
+  const [moviesList, setMoviesList] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [totalPage, setTotalPage] = useState(false);
-  const [selectedMovieUrl, setSelectedMovieUrl] = useState("");
 
   useEffect(() => {
-    if (searchQuery.trim() === "") {
+    if (movieName === "") {
+      notify("Please, enter the keyword!");
       return;
     }
-
-    async function fetchMovies() {
+    setMoviesList([]);
+    setLoading(true);
+    const getMovieByKeyword = async (movieName) => {
       try {
-        setLoading(true);
-        setError(false);
-        const { results, total_pages } = await searchMovies(searchQuery, page);
-        setTotalPage(total_pages);
-        setMovies((prevState) => [...prevState, ...results]);
-        
-       
+        await fetchMovieByKeyword(movieName).then((data) => {
+          if (!data.results.length) {
+            setLoading(false);
+            setError(true);
+            return console.log(
+              "There is no movies with this request. Please, try again"
+            );
+          }
+          setError(false);
+          setMoviesList(data.results);
+        });
       } catch (error) {
-        setError(true);
+        notify("Error, try again!");
       } finally {
         setLoading(false);
       }
-    }
+    };
+    getMovieByKeyword(movieName);
+  }, [movieName]);
 
-    fetchMovies();
-  }, [searchQuery, page]);
-
-  const handleSearch = async (searchMovie) => {
-    setSearchQuery(searchMovie);
-    setPage(1);
-    setMovies([]);
-  };
-
-  const hendleLoadMore = async () => {
-    setPage(page + 1);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const searchForm = e.currentTarget;
+    setSearchParams({ movieName: searchForm.elements.movieName.value });
+    searchForm.reset();
   };
 
   return (
-    <div>
-      <SearchBar onSearch={handleSearch} />
-
-      {error && <ErrorMessage />}
-      {Movies.length > 0 && <MovieGallery items={Movies} />}
-
-      {totalPage > page && <LoadMoreBtn onClick={hendleLoadMore} />}
-   
-      {loading && <Loader />}
-    </div>
+    <main className="container">
+      <div className={css.moviesPage}>
+        <SearchBar onSubmit={handleSubmit} />
+        {error && (
+          <p>There is no movies with this request. Please, try again</p>
+        )}
+        <ul className={css.movieList}>
+          {moviesList.map((movie) => {
+            return (
+              <li key={movie.id}>
+                <Link
+                  to={`/movies/${movie.id}`}
+                  state={{ from: location }}
+                  className={css.item}
+                >
+                  {movie.original_title || movie.name}
+                </Link>
+              </li>
+            );
+          })}
+          {loading && <Loader />}
+        </ul>
+      </div>
+    </main>
   );
 }

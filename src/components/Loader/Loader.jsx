@@ -1,18 +1,18 @@
-import { Hourglass } from "react-loader-spinner";
-export default function Loader(){
+import PropagateLoader from "react-spinners/PropagateLoader";
+import css from "./Loader.module.css";
 
-    return (
-      <div>
-        <Hourglass
-          visible={true}
-          height="80"
-          width="80"
-          ariaLabel="hourglass-loading"
-          wrapperStyle={{}}
-          wrapperClass=""
-          colors={["#306cce", "#72a1ed"]}
-        />
-        <p>Loading data, please wait...</p>
-      </div>
-    );
-}
+const Loader = ({ loading }) => {
+  return (
+    <div className={css.loader}>
+      <PropagateLoader
+        color="#13a264"
+        cssOverride={null}
+        loading={loading}
+        size={25}
+        speedMultiplier={0.7}
+      />
+    </div>
+  );
+};
+
+export default Loader;

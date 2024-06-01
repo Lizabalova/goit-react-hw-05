@@ -1,33 +1,15 @@
-.div {
-    display: block;
-    background-color: rgb(235, 231, 231);
-    border: 1px solid darkgray;
-    margin: 0;
-    padding: 15px;
-
+.nav {
+    padding: 10px 24px;
+    border-bottom: 1px solid black;
+    box-shadow: 0px 10px 12px -4px rgba(0, 0, 0, 0.36);
+    margin-bottom: 24px;
 }
 
-.container {
-    display: flex;
-    column-gap: 10px;
-    list-style: none;
-    padding: 0;
-    margin: 0;
+.navLink {
+    color: black;
+    font-size: 18px;
 }
 
-.link {
-    text-decoration: none;
-    color: white;
-    font-weight: 500;
-    padding: 10px;
-    background-color: rgb(85, 85, 85);
-    border-radius: 5px;
-}
-
-.active {
-    background-color: blue;
-
-    color: rgb(255, 255, 255, 1);
-    font-size: larger;
-    font-weight: 500;
+.navLink:first-of-type {
+    margin-right: 18px;
 }

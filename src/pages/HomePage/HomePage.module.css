@@ -1,10 +1,11 @@
-.moviesPage {
+.homePage {
     padding-left: 24px;
+    color: black;
     margin-bottom: 24px;
 }
 
 .movieList {
-    list-style: inside;
+    list-style: outside;
 }
 
 .item {
@@ -13,5 +14,5 @@
 
 .item:hover,
 .item:focus {
-    color:black;
+    color: black;
 }
